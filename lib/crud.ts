@@ -52,6 +52,30 @@ export async function getSales(userId: string) {
   return data || []
 }
 
+export async function createSale(userId: string, saleData: any) {
+  const total_amount = saleData.quantity_kg * saleData.price_per_kg
+  const { data, error } = await supabase.from('sales').insert({ ...saleData, user_id: userId, total_amount }).select().single()
+  if (error) throw error
+
+  // Mettre à jour la quantité disponible sur la prise
+  if (saleData.catch_id) {
+    const { data: catchData } = await supabase.from('catches').select('quantity_available, weight_kg').eq('id', saleData.catch_id).single()
+    if (catchData) {
+      const currentQty = catchData.quantity_available ?? catchData.weight_kg
+      const newQty = Math.max(0, currentQty - saleData.quantity_kg)
+      const newStatus = newQty === 0 ? 'sold' : newQty < catchData.weight_kg ? 'partial' : 'available'
+      await supabase.from('catches').update({ quantity_available: newQty, status: newStatus }).eq('id', saleData.catch_id)
+    }
+  }
+
+  return data
+}
+
+export async function deleteSale(id: string) {
+  const { error } = await supabase.from('sales').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function getGpsPoints(userId: string) {
   const { data, error } = await supabase.from('gps_points').select('*').eq('user_id', userId).order('created_at', { ascending: false })
   if (error) throw error
