@@ -58,7 +58,7 @@ export default function DashboardPage() {
           <p className="text-gray-400 text-sm mt-1">Clients actifs</p>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 mb-6">
         <Link href="/catches/new" className="bg-[#0f2942] text-white rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-[#1a3d5c] transition">
           <Plus size={28} className="text-[#00b4d8]" />
           <span className="font-bold text-sm">Nouvelle prise</span>
@@ -67,6 +67,12 @@ export default function DashboardPage() {
           <Users size={28} />
           <span className="font-bold text-sm">Nouveau client</span>
         </Link>
+      </div>
+      <div className="mt-2">
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">🌊 Météo & Vent</p>
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <iframe src="https://www.windguru.cz/48711" width="100%" height="400" frameBorder="0" scrolling="yes" title="Windguru" />
+        </div>
       </div>
     </Layout>
   )
