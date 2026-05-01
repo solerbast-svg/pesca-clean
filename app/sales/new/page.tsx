@@ -102,8 +102,6 @@ export default function NewSalePage() {
     <Layout title="Nouvelle vente">
       <div className="bg-white rounded-3xl border border-gray-100 p-5">
         <form onSubmit={handleSubmit} className="space-y-5">
-
-          {/* Client avec autocomplétion */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-sm font-medium text-gray-700">Client *</label>
@@ -112,7 +110,6 @@ export default function NewSalePage() {
                 {showNewClient ? '— Annuler' : '+ Nouveau client'}
               </button>
             </div>
-
             {showNewClient ? (
               <div className="bg-[#f0f7ff] rounded-xl p-4 space-y-3">
                 <input type="text" value={newClientName} onChange={e => setNewClientName(e.target.value)}
@@ -163,7 +160,6 @@ export default function NewSalePage() {
             )}
           </div>
 
-          {/* Prise */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Prise concernée</label>
             <select value={form.catch_id} onChange={e => {
@@ -177,7 +173,6 @@ export default function NewSalePage() {
             </select>
           </div>
 
-          {/* Quantité & Prix */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Quantité (kg) *</label>
@@ -190,3 +185,42 @@ export default function NewSalePage() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Prix/kg (€) *</label>
               <input type="number" step="0.01" min="0" required value={form.price_per_kg}
                 onChange={e => setForm(f => ({...f, price_per_kg: e.target.value}))}
+                placeholder="Ex: 8.50"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" />
+            </div>
+          </div>
+
+          {form.quantity_kg && form.price_per_kg && (
+            <div className="bg-[#e0f7fa] rounded-xl px-4 py-3 flex items-center justify-between">
+              <p className="text-sm font-medium text-[#006d77]">Total</p>
+              <p className="text-xl font-bold text-[#006d77]">{total} €</p>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Date *</label>
+            <input type="date" value={form.sale_date} required
+              onChange={e => setForm(f => ({...f, sale_date: e.target.value}))}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00b4d8]" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
+            <textarea value={form.notes} onChange={e => setForm(f => ({...f, notes: e.target.value}))}
+              rows={3} placeholder="Observations..."
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#00b4d8] resize-none" />
+          </div>
+
+          <div className="flex gap-3">
+            <button type="button" onClick={() => router.back()}
+              className="flex-1 border border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-medium text-sm hover:bg-gray-50 transition">Annuler</button>
+            <button type="submit" disabled={loading}
+              className="flex-1 bg-[#0f2942] text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-[#1a3d5c] transition disabled:opacity-50">
+              {loading ? 'Enregistrement...' : 'Valider la vente'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </Layout>
+  )
+}
