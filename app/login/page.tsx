@@ -11,6 +11,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [isSignup, setIsSignup] = useState(false)
+  const [form, setForm] = useState({
+    full_name: '',
+    boat_name: '',
+    license_number: '',
+    phone: '',
+    city: '',
+  })
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
@@ -18,9 +25,19 @@ export default function LoginPage() {
     setError('')
     try {
       if (isSignup) {
-        const { error } = await supabase.auth.signUp({ email, password })
+        const { data, error } = await supabase.auth.signUp({ email, password })
         if (error) throw error
-        setError('Vérifiez votre email pour confirmer votre compte.')
+        if (data.user) {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            full_name: form.full_name,
+            boat_name: form.boat_name,
+            license_number: form.license_number,
+            phone: form.phone,
+            city: form.city,
+          })
+        }
+        router.push('/dashboard')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
@@ -34,28 +51,62 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f7ff] flex flex-col items-center justify-center px-6">
-      <div className="flex flex-col items-center mb-10">
+    <div className="min-h-screen bg-[#f0f7ff] flex flex-col items-center justify-center px-6 py-10">
+      <div className="flex flex-col items-center mb-8">
         <div className="bg-[#0f2942] rounded-2xl p-5 mb-4"><Anchor size={40} className="text-[#00b4d8]" /></div>
         <h1 className="text-4xl font-bold text-[#0f2942]">PESCA</h1>
         <p className="text-[#00b4d8] font-medium mt-1">Gestion de pêche professionnelle</p>
       </div>
+
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
-        <h2 className="text-xl font-bold text-[#0f2942] mb-6 text-center">{isSignup ? 'Créer un compte' : 'Connexion'}</h2>
-        {error && <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-2xl text-sm mb-5 text-center">{error}</div>}
+        <h2 className="text-xl font-bold text-[#0f2942] mb-6 text-center">
+          {isSignup ? 'Créer un compte' : 'Connexion'}
+        </h2>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm mb-5 text-center">{error}</div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignup && (
+            <>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">Nom complet *</label>
+                <input type="text" value={form.full_name} onChange={e => setForm(f => ({...f, full_name: e.target.value}))} required placeholder="Jean-Paul Martin" className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#00b4d8]" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">Nom du bateau *</label>
+                <input type="text" value={form.boat_name} onChange={e => setForm(f => ({...f, boat_name: e.target.value}))} required placeholder="La Belle Réunion" className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#00b4d8]" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">Numéro de licence</label>
+                <input type="text" value={form.license_number} onChange={e => setForm(f => ({...f, license_number: e.target.value}))} placeholder="Ex: LIC-2024-001" className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#00b4d8]" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">Téléphone</label>
+                <input type="tel" value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} placeholder="0692 000 000" className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#00b4d8]" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-2">Ville de résidence</label>
+                <input type="text" value={form.city} onChange={e => setForm(f => ({...f, city: e.target.value}))} placeholder="Saint-Denis" className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#00b4d8]" />
+              </div>
+            </>
+          )}
+
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-2">Email</label>
+            <label className="block text-sm font-semibold text-gray-600 mb-2">Email *</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="votre@email.com" className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#00b4d8]" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-2">Mot de passe</label>
+            <label className="block text-sm font-semibold text-gray-600 mb-2">Mot de passe *</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-[#00b4d8]" />
           </div>
+
           <button type="submit" disabled={loading} className="w-full bg-[#0f2942] text-white py-4 rounded-2xl text-lg font-bold hover:bg-[#1a3d5c] transition disabled:opacity-50">
             {loading ? '...' : isSignup ? 'Créer mon compte' : 'Se connecter'}
           </button>
         </form>
+
         <button onClick={() => setIsSignup(!isSignup)} className="w-full text-center text-sm text-gray-500 mt-5 hover:text-[#00b4d8]">
           {isSignup ? 'Déjà un compte ? Se connecter' : "Pas de compte ? S'inscrire"}
         </button>
