@@ -87,3 +87,14 @@ export async function getDashboardStats(userId: string) {
     recentCatches: catches.slice(0, 5),
   }
 }
+
+export async function getLastSessions(userId: string) {
+  const { data, error } = await supabase
+    .from('catches')
+    .select('*')
+    .eq('user_id', userId)
+    .order('catch_date', { ascending: false })
+    .limit(7)
+  if (error) throw error
+  return data || []
+}

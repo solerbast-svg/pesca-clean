@@ -4,12 +4,20 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Layout from '../../components/Layout'
 import { supabase } from '../../lib/supabase'
-import { getDashboardStats } from '../../lib/crud'
+import { getDashboardStats, getLastSessions } from '../../lib/crud'
 import { Fish, Users, TrendingUp, Package, Plus } from 'lucide-react'
+
+const STATUS: any = {
+  available: { label: '🟢 Dispo', color: 'text-green-600' },
+  partial: { label: '🟡 Partiel', color: 'text-yellow-600' },
+  sold: { label: '⚫ Vendu', color: 'text-gray-500' },
+  expired: { label: '🔴 Expiré', color: 'text-red-500' },
+}
 
 export default function DashboardPage() {
   const router = useRouter()
   const [stats, setStats] = useState<any>(null)
+  const [sessions, setSessions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState<any>(null)
 
@@ -17,12 +25,14 @@ export default function DashboardPage() {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
-      const [s, p] = await Promise.all([
+      const [s, p, sess] = await Promise.all([
         getDashboardStats(user.id),
         supabase.from('profiles').select('*').eq('id', user.id).single(),
+        getLastSessions(user.id),
       ])
       setStats(s)
       setProfile(p.data)
+      setSessions(sess)
       setLoading(false)
     }
     load()
@@ -84,6 +94,25 @@ export default function DashboardPage() {
           <iframe src="https://embed.windy.com/embed2.html?lat=-21.115&lon=55.536&detailLat=-21.115&detailLon=55.536&width=650&height=450&zoom=9&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1" width="100%" height="400" frameBorder="0" title="Windy La Réunion" />
         </div>
       </div>
+      {sessions.length > 0 && (
+        <div className="mt-6">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">🐟 7 dernières sorties</p>
+          <div className="space-y-2">
+            {sessions.map((c: any) => (
+              <div key={c.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-[#0f2942]">{c.species}</p>
+                  <p className="text-sm text-gray-400">{new Date(c.catch_date).toLocaleDateString('fr-FR')} · {c.weight_kg} kg</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-xs font-semibold ${STATUS[c.status]?.color || 'text-gray-400'}`}>{STATUS[c.status]?.label || c.status}</p>
+                  {c.price_per_kg && <p className="text-sm font-bold text-[#00b4d8]">{c.price_per_kg}€/kg</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

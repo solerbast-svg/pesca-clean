@@ -2,11 +2,12 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
-import { LayoutDashboard, Fish, Users, Download, MapPin, Settings, LogOut, Anchor, X } from 'lucide-react'
+import { LayoutDashboard, Fish, Users, Download, MapPin, Settings, LogOut, Anchor, X, ShoppingCart } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/catches', label: 'Mes prises', icon: Fish },
+  { href: '/sales', label: 'Ventes', icon: ShoppingCart },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/exports', label: 'Exports', icon: Download },
   { href: '/gps', label: 'Points GPS', icon: MapPin },
