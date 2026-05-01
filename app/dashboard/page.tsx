@@ -58,4 +58,32 @@ export default function DashboardPage() {
           <p className="text-gray-400 text-sm mt-1">Clients actifs</p>
         </div>
       </div>
-      <div className="grid grid-cols-2
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <Link href="/catches/new" className="bg-[#0f2942] text-white rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-[#1a3d5c] transition">
+          <Plus size={28} className="text-[#00b4d8]" />
+          <span className="font-bold text-sm">Nouvelle prise</span>
+        </Link>
+        <Link href="/clients/new" className="bg-white border-2 border-[#0f2942] text-[#0f2942] rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-gray-50 transition">
+          <Users size={28} />
+          <span className="font-bold text-sm">Nouveau client</span>
+        </Link>
+      </div>
+      <div className="mb-6">
+        <a href="recfishing://" onClick={(e) => { e.preventDefault(); window.location.href = 'recfishing://'; setTimeout(() => { window.open('https://recfishing.eu', '_blank') }, 500) }}
+          className="w-full bg-[#006d77] text-white rounded-2xl p-4 flex items-center justify-center gap-3 hover:bg-[#005f69] transition">
+          <span className="text-2xl">🎣</span>
+          <div className="text-left">
+            <p className="font-bold">Déclarer mes prises</p>
+            <p className="text-white/70 text-sm">Ouvrir RecFishing</p>
+          </div>
+        </a>
+      </div>
+      <div className="mt-2">
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">🌊 Météo & Vent</p>
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <iframe src="https://embed.windy.com/embed2.html?lat=-21.115&lon=55.536&detailLat=-21.115&detailLon=55.536&width=650&height=450&zoom=9&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1" width="100%" height="400" frameBorder="0" title="Windy La Réunion" />
+        </div>
+      </div>
+    </Layout>
+  )
+}
